@@ -1,0 +1,283 @@
+﻿@using ShopMaster.Models.DTO
+@model ProduitDto
+
+@{
+    ViewData["Title"] = "Modifier un produit";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Modifier un produit</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data" novalidate>
+                        <input type="hidden" name="id" value="@ViewData["ProductId"]" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- Image actuelle -->
+                        @if (!string.IsNullOrEmpty(ViewData["ImageFileName"]?.ToString()))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-image me-1"></i>Image actuelle
+                                </label>
+                                <div class="current-image-container">
+                                    <img src="~/product/@ViewData["ImageFileName"]"
+                                         class="img-thumbnail current-image"
+                                         alt="Image actuelle du produit"
+                                         style="max-width: 150px; max-height: 150px;" />
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Nom du produit -->
+                        <div class="mb-3">
+                            <label asp-for="Nom" class="form-label fw-bold">
+                                <i class="fas fa-tag me-1"></i>Nom du produit
+                            </label>
+                            <input asp-for="Nom" class="form-control" placeholder="Entrez le nom du produit" />
+                            <span asp-validation-for="Nom" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Marque -->
+                        <div class="mb-3">
+                            <label asp-for="Marque" class="form-label fw-bold">
+                                <i class="fas fa-trademark me-1"></i>Marque
+                            </label>
+                            <input asp-for="Marque" class="form-control" placeholder="Entrez la marque" />
+                            <span asp-validation-for="Marque" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Quantité et Prix sur la même ligne -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="qte" class="form-label fw-bold">
+                                        <i class="fas fa-boxes me-1"></i>Quantité
+                                    </label>
+                                    <input asp-for="qte" type="number" class="form-control"
+                                           placeholder="Quantité" min="1" max="999" />
+                                    <span asp-validation-for="qte" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Prix" class="form-label fw-bold">
+                                        <i class="fas fa-euro-sign me-1"></i>Prix (€)
+                                    </label>
+                                    <input asp-for="Prix" type="number" step="0.01" class="form-control"
+                                           placeholder="0.00" min="0.01" max="999999.99" />
+                                    <span asp-validation-for="Prix" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-bold">
+                                <i class="fas fa-align-left me-1"></i>Description
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="3"
+                                      placeholder="Décrivez le produit..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Nouvelle image (optionnelle) -->
+                        <div class="mb-4">
+                            <label asp-for="ImageUrl" class="form-label fw-bold">
+                                <i class="fas fa-image me-1"></i>Nouvelle image (optionnelle)
+                            </label>
+                            <input asp-for="ImageUrl" type="file" class="form-control"
+                                   accept="image/*" />
+                            <div class="form-text">
+                                <small class="text-muted">Formats acceptés : JPG, PNG, JPEG. Laissez vide pour conserver l'image actuelle.</small>
+                            </div>
+                            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Informations de création -->
+                        @if (!string.IsNullOrEmpty(ViewData["CreatedAt"]?.ToString()))
+                        {
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Créé le : @ViewData["CreatedAt"]
+                                </small>
+                            </div>
+                        }
+
+                        <!-- Boutons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-warning text-dark" asp-action="Edit" asp-controller="Produit">
+                                <i class="fas fa-save me-1"></i>Modifier
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Validation en temps réel avec Bootstrap
+        (function() {
+            'use strict';
+
+            // Sélectionner tous les formulaires avec validation
+            var forms = document.querySelectorAll('form[novalidate]');
+
+            // Boucler sur chaque formulaire
+            Array.prototype.slice.call(forms)
+                .forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+
+            // Validation en temps réel sur les champs
+            var inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(function(input) {
+                input.addEventListener('blur', function() {
+                    if (input.checkValidity()) {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    } else {
+                        input.classList.remove('is-valid');
+                        input.classList.add('is-invalid');
+                    }
+                });
+
+                input.addEventListener('input', function() {
+                    if (input.classList.contains('is-invalid') && input.checkValidity()) {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    }
+                });
+            });
+
+            // Preview de la nouvelle image
+            var imageInput = document.querySelector('input[type="file"]');
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    var file = e.target.files[0];
+                    var currentImageContainer = document.querySelector('.current-image-container');
+
+                    if (file) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            // Créer ou mettre à jour l'aperçu de la nouvelle image
+                            var preview = document.getElementById('new-image-preview');
+                            if (!preview) {
+                                preview = document.createElement('div');
+                                preview.id = 'new-image-preview';
+                                preview.className = 'mt-2';
+                                imageInput.parentNode.insertBefore(preview, imageInput.nextSibling);
+                            }
+
+                            preview.innerHTML = '<div class="new-image-container">' +
+                                '<label class="form-label fw-bold text-success">' +
+                                '<i class="fas fa-image me-1"></i>Aperçu de la nouvelle image' +
+                                '</label>' +
+                                '<img src="' + e.target.result + '" class="img-thumbnail new-image" ' +
+                                'style="max-width: 150px; max-height: 150px;" alt="Nouvelle image">' +
+                                '</div>';
+
+                            // Atténuer l'image actuelle pour montrer qu'elle sera remplacée
+                            if (currentImageContainer) {
+                                currentImageContainer.style.opacity = '0.5';
+                                currentImageContainer.innerHTML += '<div class="text-warning small mt-1">' +
+                                    '<i class="fas fa-exclamation-triangle"></i> Cette image sera remplacée' +
+                                    '</div>';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Remettre l'image actuelle à l'opacité normale si aucun fichier sélectionné
+                        var preview = document.getElementById('new-image-preview');
+                        if (preview) {
+                            preview.remove();
+                        }
+                        if (currentImageContainer) {
+                            currentImageContainer.style.opacity = '1';
+                            var warningText = currentImageContainer.querySelector('.text-warning');
+                            if (warningText) {
+                                warningText.remove();
+                            }
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+}
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .is-valid {
+        border-color: #198754;
+    }
+
+    .is-invalid {
+        border-color: #dc3545;
+    }
+
+    .form-label {
+        color: #495057;
+    }
+
+    .btn {
+        border-radius: 6px;
+    }
+
+    .shadow {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .current-image-container {
+        transition: opacity 0.3s ease;
+    }
+
+    .new-image-container {
+        border: 2px dashed #28a745;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #f8fff9;
+    }
+
+    .current-image {
+        border: 2px solid #dee2e6;
+    }
+
+    .new-image {
+        border: 2px solid #28a745;
+    }
+</style>
