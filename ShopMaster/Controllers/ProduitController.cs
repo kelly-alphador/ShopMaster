@@ -12,14 +12,107 @@ namespace ShopMaster.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProduitController(ApplicationDbContext context,IWebHostEnvironment webHostEnvironment)
+        private readonly int pageSize = 5;
+
+        public ProduitController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;
             _context = context;
         }
-        public IActionResult Index()
+
+        public IActionResult Index(int pageIndex , string? search, string? column, string? orderBy)
         {
-            var produits=_context.Produit.OrderByDescending(p=>p.Id).ToList();
+
+            // S'assurer que pageIndex est au minimum 1
+            if (pageIndex < 1) pageIndex = 1;
+
+            IQueryable<Produit> query = _context.Produit;
+            query = query.OrderByDescending(p => p.Id);
+            //fonctionnalites recherche
+            if (search != null)
+            {
+                query = query.Where(p => p.Nom.Contains(search) || p.Marque.Contains(search));
+            }
+            string[] Lescolonnes = { "Nom", "Prix", "Marque", "DateCreation" };
+            string[] lesordres = { "asc", "desc" };
+            if (!Lescolonnes.Contains(column))
+            {
+                column = "Id";
+            }
+            if (!lesordres.Contains(orderBy))
+            {
+                orderBy = "desc";
+            }
+            if (column == "Nom")
+            {
+                if(orderBy == "asc")
+                {
+                    query = query.OrderBy(p => p.Nom);
+                }
+                else
+                {
+                    query = query.OrderByDescending(p => p.Nom);
+                }
+            }
+            else if (column == "Marque")
+            {
+                if (orderBy == "asc")
+                {
+                    query = query.OrderBy(p => p.Marque);
+                }
+                else
+                {
+                    query = query.OrderByDescending(p => p.Marque);
+                }
+            }
+            else if (column == "Prix")
+            {
+                if (orderBy == "asc")
+                {
+                    query = query.OrderBy(p => p.Prix);
+                }
+                else
+                {
+                    query = query.OrderByDescending(p => p.Prix);
+                }
+            }
+            else if (column == "DateCreation")
+            {
+                if (orderBy == "asc")
+                {
+                    query = query.OrderBy(p => p.DateCreation);
+                }
+                else
+                {
+                    query = query.OrderByDescending(p => p.DateCreation);
+                }
+            }
+            else
+            {
+                if (orderBy == "asc")
+                {
+                    query = query.OrderBy(p => p.Id);
+                }
+                else
+                {
+                    query = query.OrderByDescending(p => p.Id);
+                }
+            }
+            int count = query.Count();
+            int totalPages = (int)Math.Ceiling((double)count / pageSize);
+
+            // S'assurer que pageIndex ne dépasse pas le nombre total de pages
+            if (pageIndex > totalPages && totalPages > 0) pageIndex = totalPages;
+
+            query = query.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+            var produits = query.ToList();
+
+            // Définir les ViewData AVANT le return
+            ViewData["PageIndex"] = pageIndex;
+            ViewData["TotalPages"] = totalPages;
+            ViewData["Search"] = search??"";
+            ViewData["colonne"] = column;
+            ViewData["order"] = orderBy;
             return View(produits);
         }
         public IActionResult Create()
