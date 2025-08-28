@@ -1,8 +1,196 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<Produit>
+@{
+    ViewData["Title"] = "Accueil - Boutique en ligne";
+    ViewData["HomePage"] = true;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Section d'accueil -->
+<div class="hero-section bg-primary text-white text-center py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Bienvenue dans notre Boutique</h1>
+                <p class="lead mb-4">Découvrez notre sélection de produits de qualité à des prix imbattables. Livraison gratuite dès 50€ d'achat !</p>
+                <a href="#produits" class="btn btn-warning btn-lg px-4">Découvrir nos produits</a>
+            </div>
+            <div class="col-lg-6">
+                <img src="~/product/hero.png" class="img-fluid rounded shadow" alt="Boutique">
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Section Avantages -->
+<div class="container mb-5">
+    <div class="row text-center">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <i class="bi bi-truck fs-1 text-success mb-3"></i>
+                    <h5 class="card-title">Livraison gratuite</h5>
+                    <p class="card-text">Livraison offerte dès 50€ d'achat partout en France</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <i class="bi bi-shield-check fs-1 text-info mb-3"></i>
+                    <h5 class="card-title">Paiement sécurisé</h5>
+                    <p class="card-text">Vos transactions sont protégées par cryptage SSL</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <i class="bi bi-headset fs-1 text-warning mb-3"></i>
+                    <h5 class="card-title">Support 24/7</h5>
+                    <p class="card-text">Notre équipe est à votre disposition 24h/24</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section Produits -->
+<section id="produits" class="container mb-5">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2 class="display-5 fw-bold text-primary">Nos Produits Phares</h2>
+            <p class="lead text-muted">Découvrez notre sélection de produits les plus populaires</p>
+        </div>
+    </div>
+
+    <div class="row" id="produits-container">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var prod = Model[i];
+            <!-- Ajouter une classe CSS conditionnelle pour cacher les produits après les 4 premiers -->
+            <div class="col-lg-3 col-md-6 mb-4 produit-item @(i >= 4 ? "d-none" : "")" data-index="@i">
+                <div class="card h-100 shadow-sm">
+                    <div class="position-relative">
+                        <img src="~/product/@prod.ImageUrl" class="card-img-top" alt="@prod.Nom" style="height: 180px; object-fit: contain">
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">-20%</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">@prod.Nom</h5>
+                        <p class="card-text text-muted">@prod.Marque</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-decoration-line-through text-muted">@prod.Prix €</span>
+                                <span class="fs-5 fw-bold text-primary">719€</span>
+                            </div>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-outline-primary btn-sm">Détails</button>
+                                <button type="button" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-cart-plus"></i> Panier
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Bouton voir plus/moins -->
+    <div class="text-center mt-4">
+        <button id="toggle-produits-btn" class="btn btn-outline-primary btn-lg">
+            <span id="btn-text">Voir tous nos produits</span>
+            <i id="btn-icon" class="bi bi-arrow-down"></i>
+        </button>
+    </div>
+</section>
+
+<!-- CSS personnalisé pour les animations -->
+<style>
+    .produit-item {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<!-- JavaScript pour gérer l'affichage dynamique -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggle-produits-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnIcon = document.getElementById('btn-icon');
+        const produitsItems = document.querySelectorAll('.produit-item');
+        let showingAll = false;
+
+        // Compter le nombre total de produits
+        const totalProduits = produitsItems.length;
+
+        // Ne pas afficher le bouton s'il y a 4 produits ou moins
+        if (totalProduits <= 4) {
+            toggleBtn.style.display = 'none';
+        }
+
+        toggleBtn.addEventListener('click', function() {
+            if (!showingAll) {
+                // Afficher tous les produits
+                produitsItems.forEach((item, index) => {
+                    if (index >= 4) {
+                        item.classList.remove('d-none');
+                        item.classList.add('fade-in');
+                    }
+                });
+
+                // Mettre à jour le bouton
+                btnText.textContent = 'Voir moins de produits';
+                btnIcon.classList.remove('bi-arrow-down');
+                btnIcon.classList.add('bi-arrow-up');
+                showingAll = true;
+
+                // Défiler vers les nouveaux produits après un délai
+                setTimeout(() => {
+                    const firstHiddenProduct = document.querySelector('[data-index="4"]');
+                    if (firstHiddenProduct) {
+                        firstHiddenProduct.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest'
+                        });
+                    }
+                }, 100);
+
+            } else {
+                // Cacher les produits après les 4 premiers
+                produitsItems.forEach((item, index) => {
+                    if (index >= 4) {
+                        item.classList.add('d-none');
+                        item.classList.remove('fade-in');
+                    }
+                });
+
+                // Mettre à jour le bouton
+                btnText.textContent = 'Voir tous nos produits';
+                btnIcon.classList.remove('bi-arrow-up');
+                btnIcon.classList.add('bi-arrow-down');
+                showingAll = false;
+
+                // Défiler vers le haut de la section produits
+                document.getElementById('produits').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>

@@ -1,21 +1,24 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using ShopMaster.Context;
 using ShopMaster.Models;
 
 namespace ShopMaster.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
-            return View();
+            // Charger TOUS les produits au lieu de seulement 4
+            var produits = _context.Produit.OrderByDescending(p => p.Id).ToList();
+            return View(produits);
         }
 
         public IActionResult Privacy()

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
@@ -6,8 +7,10 @@ using ShopMaster.Context;
 using ShopMaster.Models;
 using ShopMaster.Models.DTO;
 
+
 namespace ShopMaster.Controllers
 {
+    [Microsoft.AspNetCore.Mvc.Route("/Admin/[controller]/{action=Index}/{id?}")]
     public class ProduitController : Controller
     {
         private readonly ApplicationDbContext _context;
