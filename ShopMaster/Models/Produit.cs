@@ -13,6 +13,8 @@ namespace ShopMaster.Models
         public string Marque { get; set; } = string.Empty;
         [MaxLength(3), Required]
         public int qte {  get; set; }
+        [Required, MaxLength(100)]
+        public string Category { get; set; } = "";
 
         [Precision(16,2), Required]
         public decimal Prix { get; set; }

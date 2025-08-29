@@ -12,6 +12,8 @@ namespace ShopMaster.Models.DTO
         [Required(ErrorMessage = "Le champ Quantité est obligatoire")]
         [Range(1,999,ErrorMessage ="Veuillez entrer un chiffre")]
         public int qte { get; set; }
+        [Required, MaxLength(100)]
+        public string Category { get; set; } = "";
 
         [Precision(16, 2)]
         [Range(0.01, 999999.99, ErrorMessage = "Veuillez entrer un chiffre")]

@@ -33,7 +33,21 @@
                             <input asp-for="Marque" class="form-control" placeholder="Entrez la marque" />
                             <span asp-validation-for="Marque" class="text-danger small"></span>
                         </div>
-
+                        <div class="row mb-3">
+                            <label asp-for="Category" class="form-label fw-bold">
+                                <i class="fas fa-trademark me-1"></i>Category
+                            </label>
+                            <div>
+                                <select class="form-select" asp-for="Category">
+                                    <option value='Other'>Other</option>
+                                    <option value='Phones'>Phones</option>
+                                    <option value='Computers'>Computers</option>
+                                    <option value='Accessories'>Accessories</option>
+                                    <option value='Printers'>Printers</option>
+                                    <option value='Cameras'>Cameras</option>
+                                </select>
+                            </div>
+                        </div>
                         <!-- Quantité et Prix sur la même ligne -->
                         <div class="row">
                             <div class="col-md-6">
@@ -46,6 +60,7 @@
                                     <span asp-validation-for="qte" class="text-danger small"></span>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label asp-for="Prix" class="form-label fw-bold">

@@ -20,7 +20,25 @@ namespace ShopMaster.Controllers
             var produits = _context.Produit.OrderByDescending(p => p.Id).ToList();
             return View(produits);
         }
+        public async Task<IActionResult> Details(int id)
+        {
+            try
+            {
+                var produitExist = await _context.Produit.FindAsync(id);
+                if (produitExist == null)
+                {
+                    TempData["error"] = "le produit n'existe pas";
+                    return RedirectToAction("Index", "Home");
+                }
+                return View(produitExist);
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = "Error lors de la visualisation de detaille";
+                return RedirectToAction("Index", "Home");
+            }
 
+        }
         public IActionResult Privacy()
         {
             return View();

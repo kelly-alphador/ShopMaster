@@ -177,6 +177,7 @@ namespace ShopMaster.Controllers
                     Nom = produitDto.Nom.Trim(),
                     Marque = produitDto.Marque.Trim(),
                     qte = produitDto.qte,
+                    Category=produitDto.Category,
                     Prix = produitDto.Prix,
                     Description = produitDto.Description.Trim(),
                     ImageUrl = cheminUrl,
@@ -378,5 +379,6 @@ namespace ShopMaster.Controllers
             }
 
         }
+    
     }
 }

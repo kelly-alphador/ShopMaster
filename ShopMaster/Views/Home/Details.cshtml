@@ -1,0 +1,210 @@
+﻿@model Produit
+@{
+    ViewData["Title"] = "Détails - " + Model.Nom;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Breadcrumb -->
+        <div class="col-12 mb-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-decoration-none">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Produits</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">@Model.Nom</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Image du produit -->
+        <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="position-relative">
+                    <img src="~/product/@Model.ImageUrl"
+                         alt="@Model.Nom"
+                         class="card-img-top product-image"
+                         style="height: 400px; object-fit: cover; border-radius: 0.375rem;">
+
+                    <!-- Badge de catégorie -->
+                    <span class="badge bg-primary position-absolute top-0 start-0 m-3 px-3 py-2">
+                        @Model.Category
+                    </span>
+
+                    <!-- Badge de stock -->
+                    @if (Model.qte > 0)
+                    {
+                        <span class="badge bg-success position-absolute top-0 end-0 m-3 px-3 py-2">
+                            En stock
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-3 px-3 py-2">
+                            Rupture
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations du produit -->
+        <div class="col-lg-6 col-md-12">
+            <div class="product-details">
+                <!-- En-tête du produit -->
+                <div class="mb-4">
+                    <h1 class="display-5 fw-bold text-dark mb-2">@Model.Nom</h1>
+                    <h4 class="text-muted mb-3">@Model.Marque</h4>
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="display-6 fw-bold text-success me-3">@Model.Prix.ToString("C")</span>
+                        @if (Model.qte <= 5 && Model.qte > 0)
+                        {
+                            <span class="badge bg-warning text-dark">Stock limité</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <h5 class="fw-semibold mb-3">Description</h5>
+                    <p class="text-muted lh-lg">@Model.Description</p>
+                </div>
+
+                <!-- Informations détaillées -->
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title fw-semibold mb-3">Informations produit</h6>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-tag-fill text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Marque</small>
+                                        <span class="fw-medium">@Model.Marque</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-grid-fill text-success me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Catégorie</small>
+                                        <span class="fw-medium">@Model.Category</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-box-seam text-warning me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Quantité disponible</small>
+                                        <span class="fw-medium">@Model.qte unité(s)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-calendar-fill text-info me-2"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Date de création</small>
+                                        <span class="fw-medium">@Model.DateCreation.ToString("dd/MM/yyyy")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-grid gap-2 d-md-flex">
+                    @if (Model.qte > 0)
+                    {
+                        <button type="button" class="btn btn-primary btn-lg me-md-2 px-4">
+                            <i class="bi bi-cart-plus me-2"></i>Ajouter au panier
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-lg px-4">
+                            <i class="bi bi-heart me-2"></i>Favoris
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-secondary btn-lg me-md-2 px-4" disabled>
+                            <i class="bi bi-x-circle me-2"></i>Produit indisponible
+                        </button>
+                    }
+                </div>
+
+                <!-- Informations supplémentaires -->
+                <div class="mt-4 p-3 bg-white border rounded">
+                    <div class="row text-center g-3">
+                        <div class="col-4">
+                            <i class="bi bi-truck text-primary fs-4 d-block mb-2"></i>
+                            <small class="text-muted">Livraison rapide</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="bi bi-shield-check text-success fs-4 d-block mb-2"></i>
+                            <small class="text-muted">Garantie qualité</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="bi bi-arrow-clockwise text-info fs-4 d-block mb-2"></i>
+                            <small class="text-muted">Retour gratuit</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton retour -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-image {
+        transition: transform 0.3s ease;
+    }
+
+        .product-image:hover {
+            transform: scale(1.02);
+        }
+
+    .product-details .badge {
+        font-size: 0.875rem;
+    }
+
+    .card {
+        transition: box-shadow 0.3s ease;
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    @@media (max-width: 768px) {
+        .display-5 {
+            font-size: 2rem;
+        }
+
+        .display-6 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<!-- Bootstrap Icons (à ajouter dans votre layout si pas déjà présent) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
