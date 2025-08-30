@@ -42,9 +42,9 @@ namespace ShopMaster.Context
             }
             var user = new ApplicationUser
             {
-                Nom = "Admin",
+               
                 UserName="Admin",
-                prenom = "Admin",
+               
                 Email="Admin@gmail.com",
                 Adress = "Tsaramandroso",
                 DateCreation = DateTime.Now,

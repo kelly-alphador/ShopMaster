@@ -9,47 +9,183 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ShopMaster.styles.css" asp-append-version="true" />
+    <style>
+        /* Styles pour les boutons d'authentification */
+        .auth-buttons .btn {
+            margin-left: 8px;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+        }
+
+       /*.btn-login {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+            border: none;
+            color: white;
+                }*/
+
+        /*.btn-login:hover {
+                background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+            }
+
+        .btn-register {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a2d91 100%);
+            border: none;
+            color: white;
+        }
+
+            .btn-register:hover {
+                background: linear-gradient(135deg, #5a2d91 0%, #4c2575 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
+            }*/
+
+        /* Responsive pour mobile */
+        @@media (max-width: 991.98px) {
+            .auth-buttons
+
+        {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .auth-buttons .btn {
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        }
+
+        /* Animation pour le dropdown Admin */
+        .dropdown-menu {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item {
+            width:90%;
+            border-radius: 8px;
+            margin: 2px 8px;
+            transition: all 0.3s ease;
+        }
+
+            .dropdown-item:hover {
+                background: #0d6efd;
+                color: white;
+                transform: translateX(5px);
+            }
+
+        /* Style amélioré pour la navbar */
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: #0d6efd;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+
+            .nav-link:hover {
+                background: rgba(13, 110, 253, 0.1);
+                transform: translateY(-1px);
+            }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ShopMaster</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-store me-2"></i>ShopMaster
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home me-1"></i>Home
+                            </a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Produit" asp-action="Index">Produit</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Produit" asp-action="Index">
+                                <i class="fas fa-box me-1"></i>Produit
+                            </a>
                         </li>
                     </ul>
-                    <!-- Dropdown Admin placé à droite -->
-                    <ul class="navbar-nav">
+
+                    <!-- Section droite avec Admin, Register et Login -->
+                    <ul class="navbar-nav auth-buttons">
+                        <!-- Dropdown Admin -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Admin
+                                <i class="fas fa-user-shield me-1"></i>Admin
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" Tableau de bord</a></li>
-                                <li><a class="dropdown-item" >Gestion Utilisateurs</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Produit" asp-action="Index">Gestion Produits</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-users me-2"></i>Gestion Utilisateurs
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Produit" asp-action="Index">
+                                        <i class="fas fa-boxes me-2"></i>Gestion Produits
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item">Paramètres</a></li>
-                                <li><a class="dropdown-item">Rapports</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-cog me-2"></i>Paramètres
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-chart-bar me-2"></i>Rapports
+                                    </a>
+                                </li>
                             </ul>
+                        </li>
+
+                        <!-- Bouton Register -->
+                        <li class="nav-item">
+                            <a class="btn btn-primary" asp-controller="Account" asp-action="Register" role="button">
+                                <i class="fas fa-user-plus me-1"></i>Register
+                            </a>
+                        </li>
+
+                        <!-- Bouton Login -->
+                        <li class="nav-item">
+                            <a class="btn btn-primary" asp-controller="Account" asp-action="Login" role="button">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    @if(ViewData["HomePage"]==null)
+
+    @if (ViewData["HomePage"] == null)
     {
         <div class="container">
             <main role="main" class="pb-3">
@@ -62,12 +198,11 @@
         @RenderBody()
     }
 
-
-   <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted">
         <div class="container">
-            
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
