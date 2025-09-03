@@ -463,7 +463,7 @@
         <div class="login-form">
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors" role="alert"></div>
 
-            <form method="post">
+            <form method="post" asp-controller="Account" asp-action="Login">
                 <div class="form-floating">
                     <input class="form-control" asp-for="Email" placeholder="Email" type="email" autocomplete="email">
                     <label asp-for="Email">Adresse email <span class="required-indicator">*</span></label>

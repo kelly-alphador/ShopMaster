@@ -1,0 +1,325 @@
+﻿@{
+    ViewData["Title"] = "Email confirmé - ShopMaster";
+}
+
+<style>
+    .confirmed-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 40px;
+        text-align: center;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .success-animation {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 30px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear, fade-to-check 2s ease-in-out 1s forwards;
+    }
+
+    @@keyframes spin {
+        0%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    @@keyframes fade-to-check {
+        0%
+
+    {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+    }
+
+    50% {
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        transform: scale(1.1);
+    }
+
+    100% {
+        border: none;
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1);
+    }
+
+    }
+
+    .check-icon {
+        display: none;
+        font-size: 50px;
+        animation: check-appear 0.5s ease-in-out 2s forwards;
+    }
+
+    @@keyframes check-appear {
+        0%
+
+    {
+        display: block;
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    100% {
+        display: block;
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    }
+
+    .success-title {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        font-weight: 300;
+        animation: slide-up 1s ease-out 0.5s both;
+    }
+
+    .success-message {
+        font-size: 1.2em;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        opacity: 0;
+        animation: fade-in 1s ease-out 1s forwards;
+    }
+
+    @@keyframes slide-up {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@keyframes fade-in {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    .welcome-section {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 25px;
+        border-radius: 10px;
+        margin: 30px 0;
+        backdrop-filter: blur(10px);
+        opacity: 0;
+        animation: fade-in 1s ease-out 1.5s forwards;
+    }
+
+    .benefits-list {
+        text-align: left;
+        margin: 20px 0;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+        font-size: 1em;
+        opacity: 0;
+        animation: slide-in-left 0.8s ease-out calc(2s + var(--delay)) forwards;
+    }
+
+        .benefit-item:nth-child(1) {
+            --delay: 0.1s;
+        }
+
+        .benefit-item:nth-child(2) {
+            --delay: 0.2s;
+        }
+
+        .benefit-item:nth-child(3) {
+            --delay: 0.3s;
+        }
+
+        .benefit-item:nth-child(4) {
+            --delay: 0.4s;
+        }
+
+    @@keyframes slide-in-left {
+        from
+
+    {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    }
+
+    .benefit-icon {
+        background: rgba(255, 255, 255, 0.2);
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.2em;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 30px;
+        opacity: 0;
+        animation: fade-in 1s ease-out 2.5s forwards;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #4CAF50;
+        border: 2px solid white;
+    }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+
+    .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+            color: white;
+            text-decoration: none;
+        }
+
+    .brand-name {
+        color: #FFD700;
+        font-weight: bold;
+    }
+
+    .celebration {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        pointer-events: none;
+        animation: celebration 3s ease-out 2s;
+    }
+
+    @@keyframes celebration {
+        0%
+
+    {
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(2);
+    }
+
+    }
+</style>
+
+<div class="confirmed-container">
+    <div class="success-animation">
+        <div class="check-icon">✓</div>
+    </div>
+
+    <h1 class="success-title">Email confirmé avec succès !</h1>
+
+    <p class="success-message">
+        Félicitations ! Votre adresse email a été vérifiée. Votre compte <span class="brand-name">ShopMaster</span> est maintenant entièrement activé.
+    </p>
+
+    <div class="welcome-section">
+        <h3>🎉 Bienvenue dans la famille ShopMaster !</h3>
+        <p>Vous avez maintenant accès à toutes les fonctionnalités :</p>
+
+        <div class="benefits-list">
+            <div class="benefit-item">
+                <span class="benefit-icon">🛒</span>
+                <span>Passez vos commandes en toute sécurité</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">💝</span>
+                <span>Accédez aux offres exclusives membres</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">📱</span>
+                <span>Recevez les notifications importantes</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">⭐</span>
+                <span>Gérez vos favoris et votre profil</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+            Commencer mes achats
+        </a>
+        <a href="@Url.Action("Profile", "Account")" class="btn btn-secondary">
+            Mon profil
+        </a>
+    </div>
+
+    <div class="celebration">🎊</div>
+</div>
+
+<script>
+    // Petit effet sonore de réussite (optionnel)
+    setTimeout(() => {
+        // Vous pouvez ajouter un effet sonore ici si souhaité
+        console.log("Email confirmé avec succès !");
+    }, 2000);
+</script>

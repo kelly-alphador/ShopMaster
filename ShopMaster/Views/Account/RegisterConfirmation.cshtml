@@ -1,0 +1,182 @@
+﻿@{
+    ViewData["Title"] = "Confirmation d'inscription - ShopMaster";
+}
+
+<style>
+    .confirmation-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 40px;
+        text-align: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: #4CAF50;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        animation: pulse 2s infinite;
+    }
+
+        .success-icon::after {
+            content: "✓";
+            font-size: 40px;
+            color: white;
+            font-weight: bold;
+        }
+
+    @@keyframes pulse {
+        0%
+
+    {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+    }
+
+    .confirmation-title {
+        font-size: 2.2em;
+        margin-bottom: 20px;
+        font-weight: 300;
+    }
+
+    .confirmation-message {
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        opacity: 0.9;
+    }
+
+    .email-info {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        backdrop-filter: blur(10px);
+    }
+
+    .email-icon {
+        font-size: 3em;
+        margin-bottom: 15px;
+    }
+
+    .instructions {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        text-align: left;
+    }
+
+    .instruction-item {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+        font-size: 0.95em;
+    }
+
+    .step-number {
+        background: #4CAF50;
+        color: white;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .home-button {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+
+        .home-button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+    .warning-text {
+        font-size: 0.9em;
+        opacity: 0.8;
+        margin-top: 20px;
+        font-style: italic;
+    }
+
+    .brand-name {
+        color: #FFD700;
+        font-weight: bold;
+    }
+</style>
+
+<div class="confirmation-container">
+    <div class="success-icon"></div>
+
+    <h1 class="confirmation-title">Inscription réussie !</h1>
+
+    <p class="confirmation-message">
+        Félicitations ! Votre compte <span class="brand-name">ShopMaster</span> a été créé avec succès.
+    </p>
+
+    <div class="email-info">
+        <div class="email-icon">📧</div>
+        <h3>Email de confirmation envoyé</h3>
+        <p>Un email de confirmation vient d'être envoyé à votre adresse email. Vérifiez votre boîte de réception (et vos spams si nécessaire).</p>
+    </div>
+
+    <div class="instructions">
+        <h4>Prochaines étapes :</h4>
+
+        <div class="instruction-item">
+            <span class="step-number">1</span>
+            <span>Consultez votre boîte email</span>
+        </div>
+
+        <div class="instruction-item">
+            <span class="step-number">2</span>
+            <span>Cliquez sur le lien de confirmation dans l'email</span>
+        </div>
+
+        <div class="instruction-item">
+            <span class="step-number">3</span>
+            <span>Votre compte sera activé et vous pourrez vous connecter</span>
+        </div>
+    </div>
+
+    <p class="warning-text">
+        ⚠️ Vous devez confirmer votre email avant de pouvoir vous connecter à votre compte.
+    </p>
+
+    <a href="@Url.Action("Index", "Home")" class="home-button">
+        Retour à l'accueil
+    </a>
+</div>

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShopMaster.Context;
 using ShopMaster.Models;
+using ShopMaster.Service.Interface;
+using ShopMaster.Service.repos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,23 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
-}).AddEntityFrameworkStores<ApplicationDbContext>();
+    // Configuration des utilisateurs
+    options.User.RequireUniqueEmail = true;
+
+    // Configuration de la confirmation d'email
+    options.SignIn.RequireConfirmedEmail = true;
+
+    // Configuration du verrouillage de compte
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+
+    // Configuration de la 2FA
+    options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+// Enregistrement du service d'email
+builder.Services.AddTransient<IEmailSender,EmailSender>();
 
 var app = builder.Build();
 

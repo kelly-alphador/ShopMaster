@@ -19,6 +19,10 @@
             transition: all 0.3s ease;
         }
 
+        body {
+            padding-top: 76px; /* Ajustez cette valeur selon la hauteur de votre navbar */
+        }
+
        /*.btn-login {
             background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
             border: none;
@@ -106,7 +110,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3 fixed-top">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="fas fa-store me-2"></i>ShopMaster
@@ -122,63 +126,111 @@
                                 <i class="fas fa-home me-1"></i>Home
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Produit" asp-action="Index">
-                                <i class="fas fa-box me-1"></i>Produit
-                            </a>
-                        </li>
+
                     </ul>
 
-                    <!-- Section droite avec Admin, Register et Login -->
+                    @using Microsoft.AspNetCore.Identity
+                    @inject SignInManager<ApplicationUser> SignInManager
+                    @inject UserManager<ApplicationUser> UserManager
+
+                    <!-- Section droite avec Admin, Client, Register et Login -->
                     <ul class="navbar-nav auth-buttons">
-                        <!-- Dropdown Admin -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-shield me-1"></i>Admin
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+                        @*ici on verifie si l'user est connecter*@
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            //on recuperer l'user qui est connecter
+                            var appUser = await UserManager.GetUserAsync(User);
+                            //si son role est admin
+                            if (User.IsInRole("Admin"))
+                            {
+                                <!-- Dropdown Admin -->
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-user-shield me-1"></i>@appUser!.Email (Admin)
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                                        <li>
+                                            <a class="dropdown-item" asp-area="" asp-controller="Products" asp-action="Index">
+                                                <i class="fas fa-boxes me-2"></i>Products
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-area="" asp-controller="AdminOrders" asp-action="Index">
+                                                <i class="fas fa-shopping-cart me-2"></i>Orders
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-area="" asp-controller="Users" asp-action="Index">
+                                                <i class="fas fa-users me-2"></i>Users
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
+                                                <i class="fas fa-user me-2"></i>Profile
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">
+                                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            //si son role est client
+                            else if (User.IsInRole("Client"))
+                            {
+                                <!-- Dropdown Client -->
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="clientDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-user me-1"></i>@appUser!.Email (Client)
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="clientDropdown">
+                                        <li>
+                                            <a class="dropdown-item" asp-area="" asp-controller="ClientOrders" asp-action="Index">
+                                                <i class="fas fa-shopping-cart me-2"></i>Orders
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
+                                                <i class="fas fa-user me-2"></i>Profile
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">
+                                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                <!-- Utilisateur sans rôle spécifique -->
+                                <li class="nav-item">
+                                    <a class="btn btn-outline-danger" asp-area="" asp-controller="Account" asp-action="Logout" role="button">
+                                        <i class="fas fa-sign-out-alt me-1"></i>Logout
                                     </a>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-users me-2"></i>Gestion Utilisateurs
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Produit" asp-action="Index">
-                                        <i class="fas fa-boxes me-2"></i>Gestion Produits
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-cog me-2"></i>Paramètres
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-chart-bar me-2"></i>Rapports
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <!-- Bouton Register -->
-                        <li class="nav-item">
-                            <a class="btn btn-primary" asp-controller="Account" asp-action="Register" role="button">
-                                <i class="fas fa-user-plus me-1"></i>Register
-                            </a>
-                        </li>
-
-                        <!-- Bouton Login -->
-                        <li class="nav-item">
-                            <a class="btn btn-primary" asp-controller="Account" asp-action="Login" role="button">
-                                <i class="fas fa-sign-in-alt me-1"></i>Login
-                            </a>
-                        </li>
+                            }
+                        }
+                        //si il n'est aucun est connecter
+                        else
+                        {
+                            <!-- Boutons Register et Login pour les utilisateurs non connectés -->
+                            <li class="nav-item me-2">
+                                <a class="btn btn-outline-primary" asp-area="" asp-controller="Account" asp-action="Register" role="button">
+                                    <i class="fas fa-user-plus me-1"></i>Register
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary" asp-area="" asp-controller="Account" asp-action="Login" role="button">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
