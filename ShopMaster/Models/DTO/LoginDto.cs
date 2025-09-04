@@ -4,10 +4,10 @@ namespace ShopMaster.Models.DTO
 {
     public class LoginDto
     {
-        [Required]
+        [Required(ErrorMessage ="ce champ est obligatoire")]
         public string Email { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage = "ce champ est obligatoire")]
         public string Password { get; set; } = "";
 
         public bool RememberMe { get; set; }

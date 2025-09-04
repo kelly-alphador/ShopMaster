@@ -148,6 +148,34 @@ namespace ShopMaster.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
+        public IActionResult Password()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Password(PasswordDto passwordDto)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(passwordDto);
+            }
+            var appuser=await _userManager.GetUserAsync(User);
+            if (appuser == null) 
+            {
+                return RedirectToAction("Index", "Homme");
+            }
+            var result = await _userManager.ChangePasswordAsync(appuser, passwordDto.CurrentPassword, passwordDto.NewPassword);
+            if (result.Succeeded)
+            {
+                ViewBag.SuccessMessage = "Password modifier avec succees!";
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Error: " + result.Errors.First().Description;
+            }
+
+            return View();
+        }
         public IActionResult Login()
         {
             return View();
@@ -187,11 +215,12 @@ namespace ShopMaster.Controllers
         }
         public async Task<IActionResult> Profile()
         {
-            var appUser=await _userManager.GetUserAsync(User);
-            if(appUser == null)
+            var appUser = await _userManager.GetUserAsync(User);
+            if (appUser == null)
             {
-                RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home");
             }
+
             var user = new ProfileDto
             {
                 Username = appUser.UserName,
@@ -199,7 +228,73 @@ namespace ShopMaster.Controllers
                 Tel = appUser.PhoneNumber,
                 Adress = appUser.Adress,
             };
+
             return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Profile(ProfileDto profile)
+        {
+            // Supprimer les erreurs de validation pour les champs de mot de passe
+            ModelState.Remove("Password");
+            ModelState.Remove("ConfirmPassword");
+            //tester si les utilisateurs a entrer une donnees valide 
+            if (!ModelState.IsValid)
+            {
+                return View(profile);
+            }
+            //ici on recupere l'utilisateur qu'on va modifier
+            var appUser = await _userManager.GetUserAsync(User);
+            //on verifie ici s'il est null si il est null c'est a dire l'utilisateur qui n'existe pas on a pas eu l'utilisateur
+            if (appUser == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Vérifier si l'email ou le nom d'utilisateur existe déjà
+            var existingUserByEmail = await _userManager.FindByEmailAsync(profile.Email);
+            if (existingUserByEmail != null && existingUserByEmail.Id != appUser.Id)
+            {
+                ViewBag.Error = "Cette adresse email est déjà utilisée par un autre utilisateur.";
+                return View(profile);
+            }
+            //ici on verifie si le nom de l'utilisateur n'existe pas
+            var existingUserByUsername = await _userManager.FindByNameAsync(profile.Username);
+            if (existingUserByUsername != null && existingUserByUsername.Id != appUser.Id)
+            {
+                ViewBag.Error = "Ce nom d'utilisateur est déjà utilisé par un autre utilisateur.";
+                return View(profile);
+            }
+
+            // Mettre à jour les informations
+            appUser.UserName = profile.Username;
+            appUser.Email = profile.Email;
+            appUser.Adress = profile.Adress;
+            appUser.PhoneNumber = profile.Tel;
+            //on persiste ici a la base de donnees
+
+            var result = await _userManager.UpdateAsync(appUser);
+
+            if (result.Succeeded)
+            {
+                ViewBag.success = "Profil modifié avec succès!";
+
+                // Mettre à jour le modèle avec les nouvelles données
+                var updatedProfile = new ProfileDto
+                {
+                    Username = appUser.UserName,
+                    Email = appUser.Email,
+                    Tel = appUser.PhoneNumber,
+                    Adress = appUser.Adress,
+                };
+
+                return View(updatedProfile);
+            }
+            else
+            {
+                ViewBag.Error = "Erreur lors de la modification du profil: " + result.Errors.FirstOrDefault()?.Description;
+                return View(profile);
+            }
         }
     }
 }
