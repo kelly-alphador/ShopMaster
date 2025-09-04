@@ -15,7 +15,7 @@ namespace ShopMaster.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly int pageSize = 5;
+        private readonly int pageSize = 3;
 
         public ProduitController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
