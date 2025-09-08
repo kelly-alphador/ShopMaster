@@ -109,6 +109,117 @@
     </style>
 </head>
 <body>
+    <script>
+        function getShoppingCart() {
+            // document.cookie contains all the cookies of our website with the following format
+            // cookie1=value1; cookie2=value2; cookie3=value3;
+
+            const cookieName = "shopping_cart";
+            let cookiesArray = document.cookie.split(';');
+
+            for (let i = 0; i < cookiesArray.length; i++) {
+                let cookie = cookiesArray[i];
+                if (cookie.includes(cookieName)) {
+                    let cookie_value = cookie.substring(cookie.indexOf("=") + 1);
+
+                    try {
+                        let cart = JSON.parse(atob(cookie_value));
+                        return cart;
+                    }
+                    catch (exception) {
+                        break;
+                    }
+                }
+            }
+
+            return {};
+        }
+
+
+        function saveCart(cart) {
+            let cartStr = btoa(JSON.stringify(cart))
+
+            // save cookie
+            let d = new Date();
+            d.setDate(d.getDate() + 365); // this cookie expires after 365 days (1 year)
+            let expires = d.toUTCString();
+            document.cookie = "shopping_cart=" + cartStr + ";expires=" + expires + ";path=/; SameSite=Strict; Secure";
+        }
+
+
+
+        function addToCart(button, id) {
+            let cart = getShoppingCart();
+
+            let quantity = cart[id]
+            if (isNaN(quantity)) {
+                // quantity is Not a Number => set quantity to 1
+                cart[id] = 1
+            }
+            else {
+                cart[id] = Number(quantity) + 1;
+            }
+
+            saveCart(cart);
+            button.innerHTML = "Added <i class='bi bi-check-lg'></i>";
+
+            let cartSize = 0;
+            for (var cartItem of Object.entries(cart)) {
+                quantity = cartItem[1]
+                if (isNaN(quantity)) continue;
+
+                cartSize += Number(quantity)
+            }
+
+            document.getElementById("CartSize").innerHTML = cartSize
+        }
+
+
+        function increase(id) {
+            let cart = getShoppingCart();
+
+            let quantity = cart[id]
+            if (isNaN(quantity)) {
+                // quantity is Not a Number => set it to 1
+                cart[id] = 1
+            }
+            else {
+                cart[id] = Number(quantity) + 1;
+            }
+
+            saveCart(cart);
+            location.reload()
+        }
+
+        function decrease(id) {
+            let cart = getShoppingCart();
+
+            let quantity = cart[id]
+            if (isNaN(quantity)) {
+                // quantity is Not a Number => exit
+                return
+            }
+
+            quantity = Number(quantity)
+
+            if (quantity > 1) {
+                cart[id] = quantity - 1
+                saveCart(cart)
+                location.reload()
+            }
+        }
+
+        function remove(id) {
+            let cart = getShoppingCart();
+
+            if (cart[id]) {
+                delete cart[id]
+                saveCart(cart)
+                location.reload()
+            }
+        }
+      
+    </script>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3 fixed-top">
             <div class="container-fluid">
@@ -120,21 +231,27 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
-                   <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home me-1"></i>Home
-                            </a>
-                        </li>
-
+                    <ul class="navbar-nav flex-grow-1">
+                      
                     </ul>
-
+                    @using ShopMaster.Service.repos
+                    
                     @using Microsoft.AspNetCore.Identity
                     @inject SignInManager<ApplicationUser> SignInManager
                     @inject UserManager<ApplicationUser> UserManager
 
-                    <!-- Section droite avec Admin, Client, Register et Login -->
+                    <!-- Section droite avec Panier, Admin, Client, Register et Login -->
                     <ul class="navbar-nav auth-buttons">
+                        <!-- Panier d'achat -->
+                        <li class="nav-item me-3">
+                            <a class="nav-link position-relative" asp-area="" asp-controller="Cart" asp-action="Index">
+                                <i class="fas fa-shopping-cart text-primary" style="font-size: 1.2em;"></i>
+                                <span id="CartSize" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7em;">
+                                    @CartHelper.GetCartSize(Context.Request, Context.Response)
+                                    <span class="visually-hidden">articles dans le panier</span>
+                                </span>
+                            </a>
+                        </li>
                         @*ici on verifie si l'user est connecter*@
                         @if (SignInManager.IsSignedIn(User))
                         {

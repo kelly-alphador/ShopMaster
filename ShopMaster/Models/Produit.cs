@@ -24,5 +24,7 @@ namespace ShopMaster.Models
         public string ImageUrl { get; set; } = string.Empty;
 
         public DateTime DateCreation { get; set; }=DateTime.UtcNow;
+        // Navigation
+        public ICollection<LigneCommande> LignesCommande { get; set; } = new List<LigneCommande>();
     }
 }

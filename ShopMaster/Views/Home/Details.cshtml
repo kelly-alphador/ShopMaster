@@ -120,7 +120,7 @@
                 <div class="d-grid gap-2 d-md-flex">
                     @if (Model.qte > 0)
                     {
-                        <button type="button" class="btn btn-primary btn-lg me-md-2 px-4">
+                        <button type="button" class="btn btn-primary btn-lg me-md-2 px-4" onclick="addToCart(this,@Model.Id)">
                             <i class="bi bi-cart-plus me-2"></i>Ajouter au panier
                         </button>
                         <button type="button" class="btn btn-outline-secondary btn-lg px-4">
