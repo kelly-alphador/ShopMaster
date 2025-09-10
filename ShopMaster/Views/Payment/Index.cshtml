@@ -1,0 +1,282 @@
+﻿@using ShopMaster.Models
+@{
+    ViewData["Title"] = "Paiement";
+    List<LigneCommande> cartItems = ViewBag.CartItems;
+    decimal subtotal = ViewBag.Subtotal;
+    decimal shippingFee = ViewBag.ShippingFee;
+    decimal total = ViewBag.Total;
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Accueil</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Cart" asp-action="Index">Panier</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Paiement</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <h2 class="mb-4">
+        <i class="bi bi-credit-card text-primary"></i> Finaliser votre commande
+    </h2>
+
+    <!-- Affichage des messages d'erreur -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (cartItems == null || !cartItems.Any())
+    {
+        <div class="alert alert-warning text-center py-5">
+            <h4><i class="bi bi-cart-x text-warning"></i> Votre panier est vide</h4>
+            <p>Vous devez ajouter des articles à votre panier avant de procéder au paiement.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                <i class="bi bi-shop"></i> Continuer les achats
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Colonne gauche: Récapitulatif de la commande -->
+            <div class="col-lg-8">
+                <!-- Récapitulatif des articles -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bag-check"></i> Récapitulatif de votre commande
+                            <span class="badge bg-primary ms-2">@cartItems.Count article(s)</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var item in cartItems)
+                        {
+                            <div class="row align-items-center border-bottom py-3">
+                                <div class="col-md-2">
+                                    @if (!string.IsNullOrEmpty(item.Produit.ImageUrl))
+                                    {
+                                        <img src="~/product/@item.Produit.ImageUrl"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-height: 70px; width: 70px; object-fit: cover;"
+                                             alt="@item.Produit.Nom">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center shadow-sm"
+                                             style="height: 70px; width: 70px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-5">
+                                    <h6 class="mb-1 fw-bold">@item.Produit.Nom</h6>
+                                    <small class="text-muted">@item.Produit.Marque</small>
+                                    <br>
+                                    <small class="text-primary">@item.PrixUnitaire.ToString("0.00") € × @item.Quantite</small>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <span class="badge bg-secondary fs-6">Qté: @item.Quantite</span>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <strong class="h6 text-primary">@((item.PrixUnitaire * item.Quantite).ToString("0.00")) €</strong>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Informations de livraison -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-truck"></i> Informations de livraison
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info border-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle-fill text-info me-3 fs-4"></i>
+                                <div>
+                                    <strong>Livraison standard :</strong> 3-5 jours ouvrés<br>
+                                    <small class="text-muted">Les informations de livraison seront demandées après le paiement PayPal.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Retour au panier -->
+                <div class="d-flex justify-content-start">
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour au panier
+                    </a>
+                </div>
+            </div>
+
+            <!-- Colonne droite: Section Paiement -->
+            <div class="col-lg-4">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-credit-card-2-front"></i> Résumé et Paiement
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Résumé des prix -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Sous-total :</span>
+                                <span class="fw-bold">@subtotal.ToString("0.00") €</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Frais de port :</span>
+                                <span class="fw-bold">@shippingFee.ToString("0.00") €</span>
+                            </div>
+                            <hr class="my-3">
+                            <div class="d-flex justify-content-between">
+                                <span class="h5 mb-0">Total à payer :</span>
+                                <span class="h4 text-primary fw-bold mb-0">@total.ToString("0.00") €</span>
+                            </div>
+                        </div>
+
+                        <!-- Section PayPal -->
+                        <div class="payment-section">
+                            <h6 class="mb-3 text-center">
+                                <i class="bi bi-shield-check text-success"></i> Paiement 100% sécurisé
+                            </h6>
+
+                            <div class="payment-option mb-3">
+                                <div class="card border-primary bg-light">
+                                    <div class="card-body text-center py-4">
+                                        <!-- Logo PayPal -->
+                                        <div class="mb-3">
+                                            <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-200px.png"
+                                                 alt="PayPal" style="height: 50px;" class="img-fluid">
+                                        </div>
+
+                                        <p class="text-muted mb-3 small">
+                                            <i class="bi bi-check-circle text-success"></i> Payez en toute sécurité avec votre compte PayPal<br>
+                                            <i class="bi bi-check-circle text-success"></i> Ou directement avec votre carte bancaire
+                                        </p>
+
+                                       
+                                        <form asp-action="ProcessPayPalPayment" method="post">
+                                            <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm paypal-btn">
+                                                <i class="bi bi-lock-fill me-2"></i>
+                                                Payer @total.ToString("0.00") € avec PayPal
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Informations de sécurité -->
+                            <div class="security-info p-3 bg-light border rounded">
+                                <div class="text-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-shield-lock-fill text-success me-1"></i>
+                                        <strong>Paiement sécurisé</strong><br>
+                                        Vos données sont protégées par un chiffrement SSL 256-bits
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Avantages PayPal -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h6 class="card-title text-center mb-3">
+                            <i class="bi bi-star-fill text-warning"></i> Pourquoi PayPal ?
+                        </h6>
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <i class="bi bi-shield-check text-success fs-3 d-block"></i>
+                                <small class="text-muted">Protection<br>des achats</small>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <i class="bi bi-credit-card text-success fs-3 d-block"></i>
+                                <small class="text-muted">Toutes les<br>cartes acceptées</small>
+                            </div>
+                            <div class="col-6">
+                                <i class="bi bi-lightning-charge-fill text-success fs-3 d-block"></i>
+                                <small class="text-muted">Paiement<br>instantané</small>
+                            </div>
+                            <div class="col-6">
+                                <i class="bi bi-person-check text-success fs-3 d-block"></i>
+                                <small class="text-muted">Pas de compte<br>requis</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .paypal-btn {
+        transition: all 0.3s ease;
+    }
+
+        .paypal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,123,255,0.3) !important;
+        }
+
+    .payment-option {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .payment-option:hover {
+            transform: translateY(-2px);
+        }
+
+    .security-info {
+        border-left: 4px solid #28a745 !important;
+    }
+
+    .card {
+        border-radius: 15px;
+    }
+
+    .btn {
+        border-radius: 10px;
+    }
+
+    .badge {
+        border-radius: 8px;
+    }
+
+    /* Animation pour le bouton de paiement */
+    @@keyframes pulse {
+        0%
+
+    {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+    }
+
+    .paypal-btn:focus {
+        animation: pulse 0.6s ease-in-out;
+    }
+</style>

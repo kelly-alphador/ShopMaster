@@ -8,5 +8,7 @@ namespace ShopMaster.Context
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbSet<Produit> Produit { get; set; }
+        public DbSet<Commande> Commande { get; set; }
+        public DbSet<LigneCommande> LigneCommande { get;set; }
     }
 }

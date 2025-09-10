@@ -6,33 +6,63 @@ namespace ShopMaster.Service.repos
 {
     public class CartHelper
     {
-        //on a besoin de request pour lire les donnees dans le cookie
-        //on utilise response pour supprimer le cookie
-        public static Dictionary<int, int> GetCartDictionary(HttpRequest request, HttpResponse response)
+      public static Dictionary<int, int> GetCartDictionary(HttpRequest request, HttpResponse response)
         {
-            //on recupere les donnees dans le cookie si il est vide on le met a null
+            // On récupère les données dans le cookie si il est vide on le met à null
             string cookieValue = request.Cookies["shopping_cart"] ?? "";
+
+            Console.WriteLine($"[CartHelper] Raw cookie value: '{cookieValue}'");
+            Console.WriteLine($"[CartHelper] Cookie length: {cookieValue.Length}");
+
             try
             {
                 var cart = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(cookieValue));
-                Console.WriteLine("[CartHelper] cart=" + cookieValue + " -> " + cart);
+                Console.WriteLine($"[CartHelper] Decoded cart: '{cart}'");
+
                 var dictionary = JsonSerializer.Deserialize<Dictionary<int, int>>(cart);
+                Console.WriteLine($"[CartHelper] Deserialized dictionary count: {dictionary?.Count ?? 0}");
+
                 if (dictionary != null)
                 {
                     return dictionary;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"[CartHelper] Exception: {ex.Message}");
             }
 
             if (cookieValue.Length > 0)
             {
-                // si le cookie n'est pas valide on le supprime
+                Console.WriteLine("[CartHelper] Deleting invalid cookie");
+                // Si le cookie n'est pas valide on le supprime
                 response.Cookies.Delete("shopping_cart");
             }
 
+            Console.WriteLine("[CartHelper] Returning empty dictionary");
             return new Dictionary<int, int>();
+        }
+        public static List<LigneCommande> GetCartItems(HttpRequest request, HttpResponse response, ApplicationDbContext context)
+        {
+            var dict = GetCartDictionary(request, response);
+            var cartItems = new List<LigneCommande>();
+
+            foreach (var kvp in dict) // kvp.Key = ProduitId, kvp.Value = Quantité
+            {
+                var produit = context.Produit.FirstOrDefault(p => p.Id == kvp.Key);
+                if (produit != null)
+                {
+                    cartItems.Add(new LigneCommande
+                    {
+                        ProduitId = produit.Id,       // ✅ ici on met bien l'ID du produit
+                        Produit = produit,
+                        Quantite = kvp.Value,
+                        PrixUnitaire = produit.Prix
+                    });
+                }
+            }
+
+            return cartItems;
         }
 
         public static int GetCartSize(HttpRequest request, HttpResponse response)
@@ -48,7 +78,7 @@ namespace ShopMaster.Service.repos
             return cartSize;
         }
 
-        public static List<LigneCommande> GetCartItems(HttpRequest request, HttpResponse response, ApplicationDbContext context)
+       /* public static List<LigneCommande> GetCartItems(HttpRequest request, HttpResponse response, ApplicationDbContext context)
         {
             var cartItems = new List<LigneCommande>();
             var cartDictionary = GetCartDictionary(request, response);
@@ -73,7 +103,7 @@ namespace ShopMaster.Service.repos
             }
 
             return cartItems;
-        }
+        }*/
         //cette methode sert a retourner le prix total de produit dans pannier
         public static decimal GetSubtotal(List<LigneCommande> cartItems)
         {

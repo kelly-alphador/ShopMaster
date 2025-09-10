@@ -1,0 +1,129 @@
+﻿@{
+    ViewData["Title"] = "Paiement annulé";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Message d'annulation -->
+            <div class="card border-warning shadow">
+                <div class="card-header bg-warning text-dark text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Paiement annulé
+                    </h3>
+                </div>
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-x-circle text-warning" style="font-size: 4rem;"></i>
+                    </div>
+
+                    <h4 class="text-warning mb-3">Votre paiement a été annulé</h4>
+                    <p class="lead text-muted mb-4">
+                        Vous avez annulé le processus de paiement. Aucun montant n'a été prélevé sur votre compte.
+                    </p>
+
+                    <!-- Message informatif -->
+                    <div class="alert alert-info border-0 mb-4">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <i class="bi bi-info-circle-fill text-info me-3 fs-4"></i>
+                            <div>
+                                <strong>Pas d'inquiétude !</strong><br>
+                                <small class="text-muted">
+                                    Vos articles sont toujours dans votre panier. Vous pouvez reprendre votre commande quand vous le souhaitez.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a asp-controller="Cart" asp-action="Index" class="btn btn-primary btn-lg">
+                            <i class="bi bi-cart-fill me-2"></i>
+                            Retour au panier
+                        </a>
+                        <a asp-controller="Payment" asp-action="Index" class="btn btn-success btn-lg">
+                            <i class="bi bi-credit-card me-2"></i>
+                            Réessayer le paiement
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-house-fill me-2"></i>
+                            Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section aide -->
+            <div class="card mt-4 border-0">
+                <div class="card-body text-center py-4">
+                    <h6 class="text-muted mb-3">
+                        <i class="bi bi-question-circle me-2"></i>
+                        Problème avec le paiement ?
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        Si vous avez rencontré des difficultés, voici quelques solutions :
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0 h-100">
+                                <div class="card-body py-3">
+                                    <i class="bi bi-credit-card-2-back text-primary fs-3 d-block mb-2"></i>
+                                    <h6 class="card-title">Vérifiez vos informations</h6>
+                                    <small class="text-muted">
+                                        Assurez-vous que vos données PayPal sont correctes
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0 h-100">
+                                <div class="card-body py-3">
+                                    <i class="bi bi-wifi text-primary fs-3 d-block mb-2"></i>
+                                    <h6 class="card-title">Connexion internet</h6>
+                                    <small class="text-muted">
+                                        Une connexion stable est nécessaire
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0 h-100">
+                                <div class="card-body py-3">
+                                    <i class="bi bi-headset text-primary fs-3 d-block mb-2"></i>
+                                    <h6 class="card-title">Contactez-nous</h6>
+                                    <small class="text-muted">
+                                        Notre équipe est là pour vous aider
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="mailto:support@shopmaster.com" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="bi bi-envelope me-1"></i>
+                            Nous contacter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .btn {
+        border-radius: 10px;
+    }
+
+    .alert {
+        border-radius: 12px;
+    }
+</style>

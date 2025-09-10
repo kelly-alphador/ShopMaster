@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using ShopMaster.Context;
 using ShopMaster.Models;
 using ShopMaster.Service.Interface;
@@ -37,6 +38,15 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 // Enregistrement du service d'email
 builder.Services.AddTransient<IEmailSender,EmailSender>();
+// Enregistrer le service PayPal
+builder.Services.AddScoped<PayPalService>();
+// Ajoutez ces services
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -50,7 +60,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+// Ajoutez ceci AVANT UseRouting
+app.UseSession();
 app.UseRouting();
 
 app.UseAuthorization();
