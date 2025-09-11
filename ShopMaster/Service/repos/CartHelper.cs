@@ -54,10 +54,11 @@ namespace ShopMaster.Service.repos
                 {
                     cartItems.Add(new LigneCommande
                     {
-                        ProduitId = produit.Id,       // ✅ ici on met bien l'ID du produit
+                        ProduitId = produit.Id,       // ici on met bien l'ID du produit
                         Produit = produit,
                         Quantite = kvp.Value,
-                        PrixUnitaire = produit.Prix
+                        PrixUnitaire = produit.Prix,
+                        
                     });
                 }
             }
@@ -78,32 +79,7 @@ namespace ShopMaster.Service.repos
             return cartSize;
         }
 
-       /* public static List<LigneCommande> GetCartItems(HttpRequest request, HttpResponse response, ApplicationDbContext context)
-        {
-            var cartItems = new List<LigneCommande>();
-            var cartDictionary = GetCartDictionary(request, response);
-            //le cartDictionary contient les donnes dans le cookie cle et valeur {"1": 5, "6": 2} 1 idproduit 5 valeur
-            foreach (var item in cartDictionary)
-            {
-                int productId = item.Key;
-                int quantity = item.Value;
-
-                var product = context.Produit.Find(productId);
-                if (product != null)
-                {
-                    var orderItem = new LigneCommande()
-                    {
-                        Produit = product,
-                        Quantite = quantity,
-                        PrixUnitaire = product.Prix
-                    };
-                    //on ajoute les donnees dans l'objet cartItems
-                    cartItems.Add(orderItem);
-                }
-            }
-
-            return cartItems;
-        }*/
+       
         //cette methode sert a retourner le prix total de produit dans pannier
         public static decimal GetSubtotal(List<LigneCommande> cartItems)
         {

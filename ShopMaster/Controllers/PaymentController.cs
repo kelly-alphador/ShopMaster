@@ -7,6 +7,7 @@ using PayPal.Api;
 using ShopMaster.Context;
 using ShopMaster.Models;
 using ShopMaster.Models.DTO;
+using ShopMaster.Service.Interface;
 using ShopMaster.Service.repos;
 using System;
 using System.Collections.Generic;
@@ -23,11 +24,13 @@ namespace VotreApplication.Controllers
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public PaymentController(IConfiguration configuration,ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly IFactureService _factureService;
+        public PaymentController(IConfiguration configuration,ApplicationDbContext context, UserManager<ApplicationUser> userManager, IFactureService factureService)
         {
             _configuration = configuration;
             _context = context;
             _userManager = userManager;
+            _factureService = factureService;
         }
 
         // Configuration PayPal
@@ -54,15 +57,14 @@ namespace VotreApplication.Controllers
 
             return apiContext;
         }
-
-        // Page de paiement
+        //Stocker l'ID de commande en session
         [HttpGet]
         [HttpPost] // Accepte aussi POST
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user =await _userManager.FindByIdAsync(userId);
-            var cartItems =  CartHelper.GetCartItems(Request, Response, _context); 
+            var user = await _userManager.FindByIdAsync(userId);
+            var cartItems = CartHelper.GetCartItems(Request, Response, _context);
 
             if (cartItems == null || !cartItems.Any())
             {
@@ -73,6 +75,7 @@ namespace VotreApplication.Controllers
             var subtotal = cartItems.Sum(item => item.PrixUnitaire * item.Quantite);
             var shippingFee = subtotal > 50 ? 0 : 5.99m;
             var total = subtotal + shippingFee;
+
             // 3. Créer une nouvelle commande
             var commande = new Commande
             {
@@ -80,21 +83,23 @@ namespace VotreApplication.Controllers
                 FraisLivraison = shippingFee,
                 AdresseLivraison = user.Adress,
                 MethodePaiement = "paypal",
-                StatutPaiement = "Payé",
-                StatutCommande = "Payé",
+                StatutPaiement = "En attente", 
+                StatutCommande = "En attente",
                 DateCreation = DateTime.Now,
-                
             };
 
             _context.Commande.Add(commande);
-            _context.SaveChanges(); // Pour avoir l'ID de la commande
+            _context.SaveChanges(); 
+
+            // Stocker l'ID de la commande en session
+            HttpContext.Session.SetString("CommandeId", commande.Id.ToString());
 
             foreach (var ci in cartItems)
             {
                 var produit = await _context.Produit.FindAsync(ci.ProduitId);
                 if (produit == null)
                 {
-                    // ⚠️ Produit inexistant → ignorer ou lever une erreur
+                    //  Produit inexistant → ignorer ou lever une erreur
                     continue;
                 }
 
@@ -108,8 +113,6 @@ namespace VotreApplication.Controllers
                 _context.LigneCommande.Add(ligne);
             }
             await _context.SaveChangesAsync();
-
-
 
             ViewBag.CartItems = cartItems;
             ViewBag.Subtotal = subtotal;
@@ -233,6 +236,8 @@ namespace VotreApplication.Controllers
                 return RedirectToAction("Index", "Cart");
             }
         }
+
+        //  CORRECTION dans PaymentSuccess - Maintenant on peut récupérer l'ID de commande
         [HttpGet]
         public async Task<IActionResult> PaymentSuccess(string paymentId, string PayerID)
         {
@@ -248,61 +253,98 @@ namespace VotreApplication.Controllers
                     return View("Error");
                 }
 
-                // Exécuter le paiement
+                //  Récupérer l'ID de la commande depuis la session
+                var commandeIdString = HttpContext.Session.GetString("CommandeId");
+                if (!int.TryParse(commandeIdString, out int commandeId))
+                {
+                    ViewBag.Error = "Commande introuvable";
+                    return View("Error");
+                }
+
+                // Exécuter le paiement PayPal
                 var paymentExecution = new PaymentExecution { payer_id = PayerID };
                 var payment = new Payment { id = paymentId };
                 var executedPayment = payment.Execute(apiContext, paymentExecution);
 
                 if (executedPayment.state.ToLower() == "approved")
                 {
-                    // Paiement réussi
+                    // ✅ AJOUT : Mettre à jour le statut de la commande à "Payé"
+                    var commande = await _context.Commande.FindAsync(commandeId);
+                    if (commande != null)
+                    {
+                        commande.StatutPaiement = "Payé";
+                        commande.StatutCommande = "Payé";
+                        commande.DateCreation = DateTime.Now; // Si vous avez ce champ
+                        await _context.SaveChangesAsync();
+                    }
+
+                    // Récupérer l'utilisateur connecté
+                    var user = await _userManager.GetUserAsync(User);
+
+                    // ENVOYER LA FACTURE PAR EMAIL
+                    if (user != null && !string.IsNullOrEmpty(user.Email))
+                    {
+                        try
+                        {
+                            await _factureService.EnvoyerFactureParEmailAsync(commandeId, user.Email);
+                            TempData["InvoiceSuccess"] = " Paiement réussi ! La facture a été envoyée à votre adresse email.";
+                        }
+                        catch (Exception emailEx)
+                        {
+                            // Log l'erreur mais ne pas faire échouer la transaction
+                            TempData["InvoiceWarning"] = " Paiement réussi mais erreur lors de l'envoi de la facture. Contactez le support.";
+                        }
+                    }
+                    else
+                    {
+                        TempData["InvoiceWarning"] = " Paiement réussi mais impossible d'envoyer la facture (email non trouvé).";
+                    }
+
+                    // Récupérer les détails de la transaction pour l'affichage
                     var transaction = executedPayment.transactions.FirstOrDefault();
 
+                    // Préparer les données pour la vue
                     ViewBag.PaymentId = paymentId;
                     ViewBag.PayerId = PayerID;
                     ViewBag.Amount = transaction?.amount?.total;
                     ViewBag.Currency = transaction?.amount?.currency;
                     ViewBag.TransactionId = transaction?.related_resources?.FirstOrDefault()?.sale?.id;
-
-                    var user = await _userManager.GetUserAsync(User);
+                    ViewBag.CommandeId = commandeId;
+                    ViewBag.UserEmail = user?.Email;
 
                     // Nettoyer les données temporaires
                     HttpContext.Session.Remove("PaymentId");
+                    HttpContext.Session.Remove("CommandeId");
                     Response.Cookies.Delete("shopping_cart"); // Vider le panier après commande réussie
-
-                    // Optionnel : Envoyer email de confirmation
-                    // await SendConfirmationEmail(user.Email, commande.Id);
 
                     return View("PaymentSuccess");
                 }
                 else
                 {
-                    ViewBag.Error = "Le paiement n'a pas été approuvé";
+                    ViewBag.Error = " Le paiement n'a pas été approuvé par PayPal";
                     return View("Error");
                 }
             }
             catch (Exception ex)
             {
-                ViewBag.Error = $"Erreur lors de l'exécution du paiement: {ex.Message}";
+                ViewBag.Error = $" Erreur lors de l'exécution du paiement: {ex.Message}";
                 return View("Error");
             }
         }
 
-        // Classe pour les items du panier
-        public class PanierItem
-        {
-            public int ProductId { get; set; }
-            public int Quantity { get; set; }
-        }
-        // Annulation du paiement
+
+
+       
         [HttpGet]
         public IActionResult PaymentCancel()
         {
+            // ✅ AJOUT : Nettoyer aussi l'ID de commande
             HttpContext.Session.Remove("PaymentId");
+            HttpContext.Session.Remove("CommandeId");
+
             ViewBag.Message = "Le paiement a été annulé";
             return View("PaymentCancel");
         }
-
         // Webhook PayPal (optionnel)
         [HttpPost]
         public IActionResult Webhook()

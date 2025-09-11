@@ -40,6 +40,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddTransient<IEmailSender,EmailSender>();
 // Enregistrer le service PayPal
 builder.Services.AddScoped<PayPalService>();
+builder.Services.AddScoped<IFactureService, FactureService>();
 // Ajoutez ces services
 builder.Services.AddSession(options =>
 {

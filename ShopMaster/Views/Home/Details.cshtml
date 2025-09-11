@@ -57,7 +57,9 @@
                     <h1 class="display-5 fw-bold text-dark mb-2">@Model.Nom</h1>
                     <h4 class="text-muted mb-3">@Model.Marque</h4>
                     <div class="d-flex align-items-center mb-3">
-                        <span class="display-6 fw-bold text-success me-3">@Model.Prix.ToString("C")</span>
+                        <span class="display-6 fw-bold text-success me-3">
+                            @Model.Prix.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("fr-FR"))
+                        </span>
                         @if (Model.qte <= 5 && Model.qte > 0)
                         {
                             <span class="badge bg-warning text-dark">Stock limité</span>

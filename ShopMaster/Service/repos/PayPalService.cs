@@ -107,7 +107,7 @@ namespace ShopMaster.Service.repos
             }
             catch (PayPalException payPalEx)
             {
-                // CORRECTION ICI : Utilisez payPalEx.Message au lieu de payPalEx.Details
+                
                 _logger.LogError(payPalEx, $"Erreur PayPal: {payPalEx.Message}");
                 throw;
             }
@@ -132,7 +132,7 @@ namespace ShopMaster.Service.repos
             }
             catch (PayPalException payPalEx)
             {
-                // CORRECTION ICI aussi
+             
                 _logger.LogError(payPalEx, $"Erreur PayPal lors de l'exécution: {payPalEx.Message}");
                 throw;
             }
