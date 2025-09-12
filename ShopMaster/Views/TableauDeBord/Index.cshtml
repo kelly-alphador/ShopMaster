@@ -1,0 +1,264 @@
+﻿@model TableauDeBordViewModel
+
+@{
+    ViewData["Title"] = "Tableau de Bord Administrateur";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Tableau de Bord</h1>
+    </div>
+
+    <!-- Cards Row -->
+    <div class="row">
+        <!-- Total Produits Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Produits
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.NombreTotalProduits</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-boxes fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nouveaux Clients Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Nouveaux Clients (Aujourd'hui)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.NouveauxClientsInscrits</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chiffre d'Affaires Semaine -->
+        <div class="col-xl-6 col-md-12 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                CA Total (7 derniers jours)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @Model.ChiffreAffairesSemaine.Sum(c => c.ChiffreAffaires).ToString("C", new System.Globalization.CultureInfo("fr-FR"))
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-euro-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <!-- Chiffre d'Affaires Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Chiffre d'Affaires (7 derniers jours)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="chiffreAffairesChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Produits Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Top 5 Produits Vendus</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="topProduitsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables Row -->
+    <div class="row">
+        <!-- Clients avec Plus de Commandes -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Clients avec le Plus de Commandes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Email Client</th>
+                                    <th>Nombre de Commandes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var client in Model.ClientsAvecPlusCommandes)
+                                {
+                                    <tr>
+                                        <td>@client.Email</td>
+                                        <td><span class="badge badge-success">@client.NombreCommandes</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Produits Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Produits Les Plus Vendus</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Quantité Vendue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var produit in Model.Top5ProduitsVendus)
+                                {
+                                    <tr>
+                                        <td>@produit.NomProduit</td>
+                                        <td><span class="badge badge-primary">@produit.QuantiteVendue</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Données pour le graphique du chiffre d'affaires
+        const caLabels = @Html.Raw(Json.Serialize(Model.ChiffreAffairesSemaine.Select(c => c.Date)));
+        const caData = @Html.Raw(Json.Serialize(Model.ChiffreAffairesSemaine.Select(c => c.ChiffreAffaires)));
+
+        // Graphique Chiffre d'Affaires (Line Chart)
+        const ctxCA = document.getElementById('chiffreAffairesChart').getContext('2d');
+        const chiffreAffairesChart = new Chart(ctxCA, {
+            type: 'line',
+            data: {
+                labels: caLabels,
+                datasets: [{
+                    label: 'Chiffre d\'Affaires (€)',
+                    data: caData,
+                    borderColor: 'rgb(78, 115, 223)',
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'CA: ' + context.parsed.y.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Données pour le graphique des produits
+        const produitLabels = @Html.Raw(Json.Serialize(Model.Top5ProduitsVendus.Select(p => p.NomProduit)));
+        const produitData = @Html.Raw(Json.Serialize(Model.Top5ProduitsVendus.Select(p => p.QuantiteVendue)));
+
+        // Graphique Top Produits (Doughnut Chart)
+        const ctxProduits = document.getElementById('topProduitsChart').getContext('2d');
+        const topProduitsChart = new Chart(ctxProduits, {
+            type: 'doughnut',
+            data: {
+                labels: produitLabels,
+                datasets: [{
+                    data: produitData,
+                    backgroundColor: [
+                        'rgb(78, 115, 223)',
+                        'rgb(28, 200, 138)',
+                        'rgb(54, 185, 204)',
+                        'rgb(246, 194, 62)',
+                        'rgb(231, 74, 59)'
+                    ],
+                    borderColor: [
+                        'rgb(78, 115, 223)',
+                        'rgb(28, 200, 138)',
+                        'rgb(54, 185, 204)',
+                        'rgb(246, 194, 62)',
+                        'rgb(231, 74, 59)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + ' unités';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
